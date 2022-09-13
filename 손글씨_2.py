@@ -11,6 +11,8 @@ import numpy as np
 np.random.seed(4)
 import pandas as pd
 import torch
+import imageio
+import glob
 
 data_file = open("train.csv",'r') #'r'은 읽기 전용
 data_list = data_file.readlines()
@@ -140,9 +142,7 @@ training_data_file = open("train.csv", 'r')
 training_data_list = training_data_file.readlines()
 training_data_file.close()
 
-# 학습
-
-# 주기(epoch): 학습 데이터가 학습을 위해 사용되는 횟수
+# 주기(epoch)
 epochs = 7
 
 for e in range(epochs):
@@ -177,3 +177,34 @@ for record in test_data_list:
 
 scorecard_array = numpy.asarray(scorecard)
 print ("performance = ", scorecard_array.sum() / scorecard_array.size)
+
+data_file = open("test.csv",'r') #'r'은 읽기 전용
+Test_data_list = data_file.readlines()
+data_file.close()
+
+from PIL import Image
+
+our_own_dataset = []
+label = 0
+
+# test.png는 그림판에서 붓으로 숫자 8을 그린 이미지 파일
+# test.png 파일 열어서 L(256단계 흑백이미지)로 변환
+img = Image.open("test13.png").convert("L")
+
+# 이미지를 784개 흑백 픽셀로 사이즈 변환
+img = np.resize(img, (1, 784))
+
+# 데이터를 모델에 적용할 수 있도록 가공
+test_data = ((np.array(img) / 255) - 1) * -1
+
+# data is remaining values
+inputs = test_data
+
+# query the network
+outputs = n.query(inputs)
+print (outputs)
+
+# the index of the highest value corresponds to the label
+label = np.argmax(outputs)
+print("network says ", label)
+
